@@ -38,7 +38,7 @@ class Super
 	}
 }
 
-public class TestInpsector {
+public class TestInspector {
 	private Inspector inspector = new Inspector();
 	
 	@Test
