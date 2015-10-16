@@ -1,44 +1,59 @@
 import static org.junit.Assert.*;
+
 import org.junit.Test;
 
-class Base extends Super
-{
-	private int integerField;
-	private double doubleField;
-	private String stringField;
-	private int[] intArray;
-	
-	public Base()
-	{
-		integerField = 10;
-		doubleField = 1.0;
-		stringField = "test";
-		intArray = new int[]{1, 2, 3, 4};
-	}
-}
-
-class Super
-{
-	private int superInteger;
-	private double superDouble;
-	private boolean superBool;
-	
-	public Super()
-	{
-		superInteger = -10;
-		superDouble = -1.0;
-		superBool = false;
-	}
-	
-	public Super(int integerParam, double doubleParam, boolean boolParam)
-	{
-		superInteger = integerParam;
-		superDouble = doubleParam;
-		superBool = boolParam;
-	}
-}
 
 public class TestInspector {
+	
+	private class Base extends Super implements DoSomething
+	{
+		private int integerField;
+		private double doubleField;
+		private String stringField;
+		private int[] intArray;
+		
+		public Base()
+		{
+			integerField = 10;
+			doubleField = 1.0;
+			stringField = "test";
+			intArray = new int[]{1, 2, 3, 4};
+		}
+
+		public void DoSomething() 
+		{
+			stringField = DoSomething.interfaceString + "Base is doing something";
+		}
+	}
+
+	private class Super
+	{
+		private int superInteger;
+		private double superDouble;
+		private boolean superBool;
+		
+		public Super()
+		{
+			superInteger = -10;
+			superDouble = -1.0;
+			superBool = false;
+		}
+		
+		public Super(int integerParam, double doubleParam, boolean boolParam)
+		{
+			superInteger = integerParam;
+			superDouble = doubleParam;
+			superBool = boolParam;
+		}
+	}
+
+	private interface DoSomething
+	{
+		static final String interfaceString = "IDoSomething: ";
+		
+		public void DoSomething();
+	}
+	
 	private Inspector inspector = new Inspector();
 	
 	@Test
@@ -46,7 +61,7 @@ public class TestInspector {
 	{
 		Object obj = new Base();
 		inspector.inspect(obj, false);
-		assertEquals("Base", inspector.GetInspectedClass().getName());
+		assertEquals("TestInspector$Base", inspector.GetInspectedClass().getName());
 		assertEquals(Base.class, inspector.GetInspectedClass());
 	}
 	
@@ -55,12 +70,26 @@ public class TestInspector {
 	{
 		Object obj = new Base();
 		inspector.inspect(obj, false);
-		assertEquals("Super", inspector.GetInspectedSuperClass().getName());
+		assertEquals("TestInspector$Super", inspector.GetInspectedSuperClass().getName());
 		assertEquals(Super.class, inspector.GetInspectedSuperClass());
 		
 		obj = new Super();
 		inspector.inspect(obj, false);
 		//Every class in java inherits Object directly(in case of Super) or indirectly(in case of Base)
 		assertEquals(Object.class, inspector.GetInspectedSuperClass());
+	}
+	
+	@Test
+	public void TestGetInterfaces()
+	{
+		Object obj = new Super();
+		inspector.inspect(obj, false);
+		assertEquals(0, inspector.GetInspectedInterfaces().length);
+		
+		obj = new Base();
+		inspector.inspect(obj, false);
+		assertEquals(1, inspector.GetInspectedInterfaces().length);
+		assertEquals("TestInspector$DoSomething", inspector.GetInspectedInterfaces()[0].getName());
+		assertEquals(DoSomething.class, inspector.GetInspectedInterfaces()[0]);	
 	}
 }

@@ -13,11 +13,11 @@ public class Inspector
 	private Class[] inspectedInterfaces;
 	
 	
-	
 	public void inspect(Object obj, boolean recursive)
 	{
 		getClass(obj);
 		getSuperClass(obj);
+		getInterfaces(obj);
 		
 		//printInspectedName(inspectedClass);
 		//printInspectedName(inspectedSuperClass);
@@ -40,7 +40,7 @@ public class Inspector
 	
 	private void getInterfaces(Object obj)
 	{
-		
+		inspectedInterfaces = obj.getClass().getInterfaces();
 	}
 	
 	private void getSuperClass(Object obj)
@@ -66,5 +66,10 @@ public class Inspector
 	public Class GetInspectedSuperClass()
 	{
 		return inspectedSuperClass;
+	}
+	
+	public Class[] GetInspectedInterfaces()
+	{
+		return inspectedInterfaces;
 	}
 }
