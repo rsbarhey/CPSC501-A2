@@ -1,25 +1,28 @@
 import java.lang.reflect.*;
 import java.lang.Object;
 import java.lang.Class;
-import java.util.ArrayList;
 
 public class Inspector 
 {
 	private Class inspectedClass;
 	private Class inspectedSuperClass;
 	
-	private ArrayList<Constructor> inspectedConstructors;
-	private ArrayList<Method> inspectedMethods;
-	private ArrayList<Field> inspectedFields;
-	private ArrayList<Class> inspectedInterfaces;
+	private Constructor[] inspectedConstructors;
+	private Method[] inspectedMethods;
+	private Field[] inspectedFields;
+	private Class[] inspectedInterfaces;
 	
 	
 	
 	public void inspect(Object obj, boolean recursive)
 	{
 		getClass(obj);
+		getSuperClass(obj);
+		
+		//printInspectedName(inspectedClass);
+		//printInspectedName(inspectedSuperClass);
 	}
-	
+
 	private void getConstructors(Object obj)
 	{
 		
@@ -42,17 +45,26 @@ public class Inspector
 	
 	private void getSuperClass(Object obj)
 	{
-		
+		inspectedSuperClass = obj.getClass().getSuperclass();
 	}
 	
 	private void getClass(Object obj)
 	{
-		Class c = obj.getClass();
-		inspectedClass = c;
+		inspectedClass = obj.getClass();
+	}
+	
+	private void printInspectedName(Object inpsectedObject) 
+	{
+		System.out.println(inpsectedObject);
 	}
 	
 	public Class GetInspectedClass()
 	{
 		return inspectedClass;
+	}
+	
+	public Class GetInspectedSuperClass()
+	{
+		return inspectedSuperClass;
 	}
 }
