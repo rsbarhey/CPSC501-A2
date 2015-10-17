@@ -19,6 +19,7 @@ public class Inspector
 		getSuperClass(obj);
 		getInterfaces(obj);
 		getFields(obj);
+		getMethods(obj);
 		
 		//printInspectedName(inspectedClass);
 		//printInspectedName(inspectedSuperClass);
@@ -36,7 +37,7 @@ public class Inspector
 	
 	private void getMethods(Object obj)
 	{
-		
+		inspectedMethods = obj.getClass().getDeclaredMethods();
 	}
 	
 	private void getInterfaces(Object obj)
@@ -77,5 +78,10 @@ public class Inspector
 	public Field[] GetInspectedFields()
 	{
 		return inspectedFields;
+	}
+	
+	public Method[] GetInspectedMethods()
+	{
+		return inspectedMethods;
 	}
 }

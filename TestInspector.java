@@ -107,4 +107,17 @@ public class TestInspector {
 		inspector.inspect(obj, false);
 		assertEquals(3, inspector.GetInspectedFields().length);
 	}
+	
+	@Test
+	public void TestGetMethods()
+	{
+		Object obj = new Base();
+		inspector.inspect(obj, false);
+		assertEquals(1, inspector.GetInspectedMethods().length);
+		assertEquals("DoSomething", inspector.GetInspectedMethods()[0].getName());
+		
+		obj = new Super();
+		inspector.inspect(obj, false);
+		assertEquals(0, inspector.GetInspectedMethods().length);
+	}
 }
