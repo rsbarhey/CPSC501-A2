@@ -2,57 +2,56 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+class Base extends Super implements DoSomething
+{
+	private int integerField;
+	private double doubleField;
+	private String stringField;
+	private int[] intArray;
+	
+	public Base()
+	{
+		integerField = 10;
+		doubleField = 1.0;
+		stringField = "test";
+		intArray = new int[]{1, 2, 3, 4};
+	}
+
+	public void DoSomething() 
+	{
+		stringField = DoSomething.interfaceString + "Base is doing something";
+	}
+}
+
+class Super
+{
+	private int superInteger;
+	private double superDouble;
+	private boolean superBool;
+	
+	public Super()
+	{
+		superInteger = -10;
+		superDouble = -1.0;
+		superBool = false;
+	}
+	
+	public Super(int integerParam, double doubleParam, boolean boolParam)
+	{
+		superInteger = integerParam;
+		superDouble = doubleParam;
+		superBool = boolParam;
+	}
+}
+
+interface DoSomething
+{
+	static final String interfaceString = "IDoSomething: ";
+	
+	public void DoSomething();
+}
 
 public class TestInspector {
-	
-	private class Base extends Super implements DoSomething
-	{
-		private int integerField;
-		private double doubleField;
-		private String stringField;
-		private int[] intArray;
-		
-		public Base()
-		{
-			integerField = 10;
-			doubleField = 1.0;
-			stringField = "test";
-			intArray = new int[]{1, 2, 3, 4};
-		}
-
-		public void DoSomething() 
-		{
-			stringField = DoSomething.interfaceString + "Base is doing something";
-		}
-	}
-
-	private class Super
-	{
-		private int superInteger;
-		private double superDouble;
-		private boolean superBool;
-		
-		public Super()
-		{
-			superInteger = -10;
-			superDouble = -1.0;
-			superBool = false;
-		}
-		
-		public Super(int integerParam, double doubleParam, boolean boolParam)
-		{
-			superInteger = integerParam;
-			superDouble = doubleParam;
-			superBool = boolParam;
-		}
-	}
-
-	private interface DoSomething
-	{
-		static final String interfaceString = "IDoSomething: ";
-		
-		public void DoSomething();
-	}
 	
 	private Inspector inspector = new Inspector();
 	
@@ -61,7 +60,7 @@ public class TestInspector {
 	{
 		Object obj = new Base();
 		inspector.inspect(obj, false);
-		assertEquals("TestInspector$Base", inspector.GetInspectedClass().getName());
+		assertEquals("Base", inspector.GetInspectedClass().getName());
 		assertEquals(Base.class, inspector.GetInspectedClass());
 	}
 	
@@ -70,7 +69,7 @@ public class TestInspector {
 	{
 		Object obj = new Base();
 		inspector.inspect(obj, false);
-		assertEquals("TestInspector$Super", inspector.GetInspectedSuperClass().getName());
+		assertEquals("Super", inspector.GetInspectedSuperClass().getName());
 		assertEquals(Super.class, inspector.GetInspectedSuperClass());
 		
 		obj = new Super();
@@ -89,7 +88,23 @@ public class TestInspector {
 		obj = new Base();
 		inspector.inspect(obj, false);
 		assertEquals(1, inspector.GetInspectedInterfaces().length);
-		assertEquals("TestInspector$DoSomething", inspector.GetInspectedInterfaces()[0].getName());
+		assertEquals("DoSomething", inspector.GetInspectedInterfaces()[0].getName());
 		assertEquals(DoSomething.class, inspector.GetInspectedInterfaces()[0]);	
+	}
+	
+	@Test
+	public void TestGetFields()
+	{
+		Object obj = new Base();
+		inspector.inspect(obj, false);
+		assertEquals(4, inspector.GetInspectedFields().length);
+		assertEquals("integerField", inspector.GetInspectedFields()[0].getName());
+		assertEquals("doubleField", inspector.GetInspectedFields()[1].getName());
+		assertEquals("stringField", inspector.GetInspectedFields()[2].getName());
+		assertEquals("intArray", inspector.GetInspectedFields()[3].getName());
+		
+		obj = new Super();
+		inspector.inspect(obj, false);
+		assertEquals(3, inspector.GetInspectedFields().length);
 	}
 }
