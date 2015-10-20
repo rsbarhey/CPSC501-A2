@@ -120,4 +120,20 @@ public class TestInspector {
 		inspector.inspect(obj, false);
 		assertEquals(0, inspector.GetInspectedMethods().length);
 	}
+	
+	@Test
+	public void TestGetConstructors()
+	{
+		Object obj = new Base();
+		inspector.inspect(obj, false);
+		assertEquals(1, inspector.GetInspectedConstructors().length);
+		assertEquals("Base", inspector.GetInspectedConstructors()[0].getName());
+		assertEquals(0, inspector.GetInspectedConstructors()[0].getParameterTypes().length);
+		
+		obj = new Super();
+		inspector.inspect(obj, false);
+		assertEquals(2, inspector.GetInspectedConstructors().length);
+		assertEquals("Super", inspector.GetInspectedConstructors()[1].getName());
+		assertEquals(3, inspector.GetInspectedConstructors()[1].getParameterTypes().length);
+	}
 }
