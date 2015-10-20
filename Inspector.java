@@ -22,8 +22,39 @@ public class Inspector
 		getMethods(obj);
 		getConstructors(obj);
 		
-		//printInspectedName(inspectedClass);
-		//printInspectedName(inspectedSuperClass);
+		printInspectedName(inspectedClass, "Inspecting class: \t\t");
+		printInspectedName(inspectedSuperClass, "Imidiate super class: \t\t");
+		System.out.println("-----------------------------------------------------------------------------------------------");
+		printListOfInspectedNames(inspectedInterfaces, "Imidiate interfaces: \t\t");
+		System.out.println("-----------------------------------------------------------------------------------------------");
+		printListOfInspectedNames(inspectedConstructors, "Declared constructors: \t\t");
+		System.out.println("-----------------------------------------------------------------------------------------------");
+		printListOfInspectedNames(inspectedMethods, "Declared methods: \t\t");
+		System.out.println("-----------------------------------------------------------------------------------------------");
+		printListOfInspectedNames(inspectedFields, "Declared fields: \t\t");
+		System.out.println("-----------------------------------------------------------------------------------------------");
+		System.out.println("===============================================================================================");
+	}
+	
+	private void printInspectedName(Object inpsectedObject, String header) 
+	{
+		System.out.println(header + inpsectedObject);
+	}
+	
+	private void printListOfInspectedNames(Object[] inspectedObjects, String header)
+	{
+		if(inspectedObjects.length == 0)
+		{
+			System.out.println(header + "None");
+		}
+		else
+		{
+			System.out.printf(header + "%d \n", inspectedObjects.length);
+			for(int i = 0; i<inspectedObjects.length; i++)
+			{
+				printInspectedName(inspectedObjects[i], "");
+			}
+		}
 	}
 
 	private void getConstructors(Object obj)
@@ -54,11 +85,6 @@ public class Inspector
 	private void getClass(Object obj)
 	{
 		inspectedClass = obj.getClass();
-	}
-	
-	private void printInspectedName(Object inpsectedObject) 
-	{
-		System.out.println(inpsectedObject);
 	}
 	
 	public Class GetInspectedClass()

@@ -21,6 +21,11 @@ class Base extends Super implements DoSomething
 	{
 		stringField = DoSomething.interfaceString + "Base is doing something";
 	}
+	
+	public String methodFromBase(String string, int[] intArray) throws Exception
+	{
+		return "";
+	}
 }
 
 class Super
@@ -41,6 +46,13 @@ class Super
 		superInteger = integerParam;
 		superDouble = doubleParam;
 		superBool = boolParam;
+	}
+	
+	public Super(Super para) throws Exception
+	{
+		superInteger = para.superInteger;
+		superDouble = para.superDouble;
+		superBool = para.superBool;
 	}
 }
 
@@ -113,7 +125,7 @@ public class TestInspector {
 	{
 		Object obj = new Base();
 		inspector.inspect(obj, false);
-		assertEquals(1, inspector.GetInspectedMethods().length);
+		assertEquals(2, inspector.GetInspectedMethods().length);
 		assertEquals("DoSomething", inspector.GetInspectedMethods()[0].getName());
 		
 		obj = new Super();
@@ -132,7 +144,7 @@ public class TestInspector {
 		
 		obj = new Super();
 		inspector.inspect(obj, false);
-		assertEquals(2, inspector.GetInspectedConstructors().length);
+		assertEquals(3, inspector.GetInspectedConstructors().length);
 		assertEquals("Super", inspector.GetInspectedConstructors()[1].getName());
 		assertEquals(3, inspector.GetInspectedConstructors()[1].getParameterTypes().length);
 	}
