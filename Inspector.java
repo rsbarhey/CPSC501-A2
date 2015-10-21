@@ -104,6 +104,7 @@ public class Inspector
 	
 	private void printFieldsValues(Field[] fields, Object obj, boolean recursive)
 	{
+		System.out.println("Printing the class values \t recursion is set to: " + Boolean.toString(recursive));
 		for(int i = 0; i<fields.length; i++)
 		{
 			fields[i].setAccessible(true);
@@ -119,30 +120,26 @@ public class Inspector
 				else if(value.getClass().isArray())
 				{
 					int length = Array.getLength(value);
+					System.out.println();
+					System.out.println(value.getClass().getComponentType().getName() + "[] "+ fields[i].getName());
 					for(int index = 0; index<length; index++)
 					{
-						if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass().getComponentType()) || value.getClass().getComponentType().isPrimitive())
+						if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass().getComponentType()) || value.getClass().getComponentType().isPrimitive() || Array.get(value, index) == null)
 						{
 							printInspectedName(Array.get(value, index), fields[i].getName() + "[" + Integer.toString(index)+ "] = ");
 						}
 						
 						else if(recursive)
 						{
-							
+							printFieldsValuesRecursively(fields[i].getName() + "[" + Integer.toString(index)+ "]", value.getClass().getComponentType(), Array.get(value, index), obj);
 						}
 						
 						else
 						{
-							if(Array.get(value, index) == null)
-							{
-								printInspectedName(Array.get(value, index), fields[i].getName() + "[" + Integer.toString(index)+ "] = ");
-							}
-							else
-							{
-								printInspectedName(Array.get(value, index).hashCode(), fields[i].getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");
-							}
+							printInspectedName(Array.get(value, index).hashCode(), fields[i].getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");	
 						}
 					}
+					System.out.println();
 				}
 				
 				else if (Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass()) || value.getClass().isPrimitive())
@@ -152,7 +149,9 @@ public class Inspector
 				
 				else if(recursive)
 				{
-					printFieldsValuesRecursively(fields[i], value, obj);
+					System.out.println();
+					printFieldsValuesRecursively(fields[i].getName(), fields[i].getType(), value, obj);
+					System.out.println();
 				}
 				
 				else
@@ -170,16 +169,35 @@ public class Inspector
 		}
 	}
 	
-	private void printFieldsValuesRecursively(Field field, Object fieldValue, Object originalObj)
+	private void printFieldsValuesRecursively(String memberName, Class<?> type, Object fieldValue, Object originalObj)
 	{
 		if(fieldValue == null || Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass()) || fieldValue.getClass().isPrimitive())
 		{
-			printInspectedName(fieldValue, field.getName() + " = ");
+			printInspectedName(fieldValue, memberName + " = ");
+		}
+		else if(fieldValue.getClass().isArray())
+		{
+			int length = Array.getLength(fieldValue);
+			System.out.println();
+			System.out.println(fieldValue.getClass().getComponentType().getName() + "[] "+ memberName);
+			for(int index = 0; index<length; index++)
+			{
+				if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass().getComponentType()) || fieldValue.getClass().getComponentType().isPrimitive() || Array.get(fieldValue, index) == null)
+				{
+					printInspectedName(Array.get(fieldValue, index), memberName + "[" + Integer.toString(index)+ "] = ");
+				}
+				
+				else
+				{
+					printFieldsValuesRecursively(memberName + "[" + Integer.toString(index)+ "]", fieldValue.getClass().getComponentType(), Array.get(fieldValue, index), originalObj);
+				}
+			}
+			System.out.println();
 		}
 		else
 		{
-			System.out.println(field.getName()+ "has members: ");
-			Field[] fieldMembers = field.getType().getDeclaredFields();
+			System.out.println(memberName+ " object has members: ");
+			Field[] fieldMembers = type.getDeclaredFields();
 			for(int i = 0; i < fieldMembers.length; i++)
 			{
 				
@@ -187,7 +205,7 @@ public class Inspector
 				{
 					fieldMembers[i].setAccessible(true);
 					Object value = fieldMembers[i].get(originalObj);
-					printFieldsValuesRecursively(fieldMembers[i], value, originalObj);
+					printFieldsValuesRecursively(fieldMembers[i].getName(), fieldMembers[i].getType(), value, originalObj);
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {

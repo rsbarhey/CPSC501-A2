@@ -9,6 +9,7 @@ class Base extends Super implements DoSomething
 	private String stringField;
 	private int[] intArray;
 	private Super superField = new Super();
+	private Super[] listSuperField;
 	
 	public Base()
 	{
@@ -16,6 +17,7 @@ class Base extends Super implements DoSomething
 		doubleField = 1.0;
 		stringField = "test";
 		intArray = new int[]{1, 2, 3, 4};
+		listSuperField = new Super[]{new Super(), new Super(15, 1.5, true)};
 	}
 
 	public void DoSomething() 
@@ -34,12 +36,14 @@ class Super
 	private int superInteger;
 	private double superDouble;
 	private boolean superBool;
+	private int[] superIntArray;
 	
 	public Super()
 	{
 		superInteger = -10;
 		superDouble = -1.0;
 		superBool = false;
+		superIntArray = new int[]{1, 2, 3, 4, 6, 7, 8, 9, 10};
 	}
 	
 	public Super(int integerParam, double doubleParam, boolean boolParam)
@@ -47,6 +51,7 @@ class Super
 		superInteger = integerParam;
 		superDouble = doubleParam;
 		superBool = boolParam;
+		superIntArray = new int[]{1, 2, 3, 4, 6, 7, 8};
 	}
 	
 	public Super(Super para) throws Exception
@@ -110,7 +115,7 @@ public class TestInspector {
 	{
 		Object obj = new Base();
 		inspector.inspect(obj, false);
-		assertEquals(5, inspector.GetInspectedFields().length);
+		assertEquals(6, inspector.GetInspectedFields().length);
 		assertEquals("integerField", inspector.GetInspectedFields()[0].getName());
 		assertEquals("doubleField", inspector.GetInspectedFields()[1].getName());
 		assertEquals("stringField", inspector.GetInspectedFields()[2].getName());
@@ -118,7 +123,7 @@ public class TestInspector {
 		
 		obj = new Super();
 		inspector.inspect(obj, false);
-		assertEquals(3, inspector.GetInspectedFields().length);
+		assertEquals(4, inspector.GetInspectedFields().length);
 	}
 	
 	@Test
