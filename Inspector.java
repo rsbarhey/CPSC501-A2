@@ -1,6 +1,7 @@
 import java.lang.reflect.*;
 import java.lang.Object;
 import java.lang.Class;
+import java.util.Arrays;
 
 public class Inspector
 {
@@ -11,6 +12,8 @@ public class Inspector
 	private Method[] inspectedMethods;
 	private Field[] inspectedFields;
 	private Class[] inspectedInterfaces;
+	
+	final Class<?>[] PRIMITIVE_WRAPPERS = {Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, String.class};
 
 	public void inspect(Object obj, boolean recursive)
 	{
@@ -41,7 +44,7 @@ public class Inspector
 		System.out.println("_______________________________________________________________________________________________");
 		
 		//Printing values
-		printFieldsValues(obj, recursive);
+		printFieldsValues(inspectedFields, obj, recursive);
 		System.out.println("===============================================================================================");
 	}
 
@@ -99,25 +102,30 @@ public class Inspector
 		}
 	}
 	
-	private void printFieldsValues(Object obj, boolean recursive)
+	private void printFieldsValues(Field[] fields, Object obj, boolean recursive)
 	{
-		for(int i = 0; i<inspectedFields.length; i++)
+		for(int i = 0; i<fields.length; i++)
 		{
-			inspectedFields[i].setAccessible(true);
+			fields[i].setAccessible(true);
 			try 
 			{
-				Object value = inspectedFields[i].get(obj);
+				Object value = fields[i].get(obj);
+				
 				if(value.getClass().isArray())
 				{
 					int length = Array.getLength(value);
 					for(int index = 0; index<length; index++)
 					{
-						printInspectedName(Array.get(value, index), inspectedFields[i].getName() + "[" + Integer.toString(index)+ "]= ");
+						if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass().getComponentType()) || value.getClass().getComponentType().isPrimitive())
+						{
+							printInspectedName(Array.get(value, index), fields[i].getName() + "[" + Integer.toString(index)+ "] = ");
+						}
 					}
 				}
-				else
+				
+				else if (Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass()) || value.getClass().isPrimitive())
 				{
-					printInspectedName(value.toString(), inspectedFields[i].getName() + " value is: \t\t");
+					printInspectedName(value.toString(), fields[i].getName() + " = ");
 				}
 			} 
 			catch (IllegalArgumentException e) {
