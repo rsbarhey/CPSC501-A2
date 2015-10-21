@@ -116,27 +116,7 @@ public class Inspector
 		
 		if(obj.getClass().isArray())
 		{
-			int length = Array.getLength(obj);
-			System.out.println();
-			System.out.println(obj.getClass().getName() + " "+ obj.getClass().getName());
-			for(int index = 0; index<length; index++)
-			{
-				if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(obj.getClass().getComponentType()) || obj.getClass().getComponentType().isPrimitive() || Array.get(obj, index) == null)
-				{
-					printInspectedName(Array.get(obj, index), obj.getClass().getName() + "[" + Integer.toString(index)+ "] = ");
-				}
-				
-				else if(recursive)
-				{
-					printFieldsValuesRecursively(obj.getClass().getName() + "[" + Integer.toString(index)+ "]", obj.getClass().getComponentType(), Array.get(obj, index));
-				}
-				
-				else
-				{
-					printInspectedName(Array.get(obj, index).hashCode(), obj.getClass().getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");	
-				}
-			}
-			System.out.println();
+			printingArrayValue(obj, recursive);
 		}
 		
 		else{
@@ -154,27 +134,7 @@ public class Inspector
 				
 					else if(value.getClass().isArray())
 					{
-						int length = Array.getLength(value);
-						System.out.println();
-						System.out.println(value.getClass().getName() + " "+ fields[i].getName());
-						for(int index = 0; index<length; index++)
-						{
-							if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass().getComponentType()) || value.getClass().getComponentType().isPrimitive() || Array.get(value, index) == null)
-							{
-								printInspectedName(Array.get(value, index), fields[i].getName() + "[" + Integer.toString(index)+ "] = ");
-							}
-						
-							else if(recursive)
-							{
-								printFieldsValuesRecursively(fields[i].getName() + "[" + Integer.toString(index)+ "]", value.getClass().getComponentType(), Array.get(value, index));
-							}
-						
-							else
-							{
-								printInspectedName(Array.get(value, index).hashCode(), fields[i].getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");	
-							}
-						}
-						System.out.println();
+						printingArrayValue(value, recursive);
 					}
 				
 					else if (Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass()) || value.getClass().isPrimitive())
@@ -220,7 +180,7 @@ public class Inspector
 		{
 			int length = Array.getLength(fieldValue);
 			System.out.println();
-			System.out.println(fieldValue.getClass().getComponentType().getName() + "[] "+ memberName);
+			System.out.println(fieldValue.getClass().getName() + " "+ memberName);
 			for(int index = 0; index<length; index++)
 			{
 				if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass().getComponentType()) || fieldValue.getClass().getComponentType().isPrimitive() || Array.get(fieldValue, index) == null)
@@ -254,6 +214,31 @@ public class Inspector
 				} 
 			}
 		}
+	}
+	
+	private void printingArrayValue(Object obj, boolean recursive)
+	{
+		int length = Array.getLength(obj);
+		System.out.println();
+		System.out.println(obj.getClass().getName() + " "+ obj.getClass().getName());
+		for(int index = 0; index<length; index++)
+		{
+			if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(obj.getClass().getComponentType()) || obj.getClass().getComponentType().isPrimitive() || Array.get(obj, index) == null)
+			{
+				printInspectedName(Array.get(obj, index), obj.getClass().getName() + "[" + Integer.toString(index)+ "] = ");
+			}
+			
+			else if(recursive)
+			{
+				printFieldsValuesRecursively(obj.getClass().getName() + "[" + Integer.toString(index)+ "]", obj.getClass().getComponentType(), Array.get(obj, index));
+			}
+			
+			else
+			{
+				printInspectedName(Array.get(obj, index).hashCode(), obj.getClass().getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");	
+			}
+		}
+		System.out.println();
 	}
 
 	private void getConstructors(Object obj) 
