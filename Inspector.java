@@ -128,7 +128,7 @@ public class Inspector
 				
 				else if(recursive)
 				{
-					printFieldsValuesRecursively(obj.getClass().getName() + "[" + Integer.toString(index)+ "]", obj.getClass().getComponentType(), Array.get(obj, index), obj);
+					printFieldsValuesRecursively(obj.getClass().getName() + "[" + Integer.toString(index)+ "]", obj.getClass().getComponentType(), Array.get(obj, index));
 				}
 				
 				else
@@ -166,7 +166,7 @@ public class Inspector
 						
 							else if(recursive)
 							{
-								printFieldsValuesRecursively(fields[i].getName() + "[" + Integer.toString(index)+ "]", value.getClass().getComponentType(), Array.get(value, index), obj);
+								printFieldsValuesRecursively(fields[i].getName() + "[" + Integer.toString(index)+ "]", value.getClass().getComponentType(), Array.get(value, index));
 							}
 						
 							else
@@ -185,7 +185,7 @@ public class Inspector
 					else if(recursive)
 					{
 						System.out.println();
-						printFieldsValuesRecursively(fields[i].getName(), fields[i].getType(), value, obj);
+						printFieldsValuesRecursively(fields[i].getName(), fields[i].getType(), value);
 						System.out.println();
 					}
 				
@@ -205,8 +205,13 @@ public class Inspector
 		}
 	}
 	
-	private void printFieldsValuesRecursively(String memberName, Class<?> type, Object fieldValue, Object originalObj)
+	private void printFieldsValuesRecursively(String memberName, Class<?> type, Object fieldValue)
 	{
+		if(printedObjectsValues.contains(fieldValue))
+		{
+			System.out.println("Object has already been printed");
+			return;
+		}
 		if(fieldValue == null || Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass()) || fieldValue.getClass().isPrimitive())
 		{
 			printInspectedName(fieldValue, memberName + " = ");
@@ -225,7 +230,7 @@ public class Inspector
 				
 				else
 				{
-					printFieldsValuesRecursively(memberName + "[" + Integer.toString(index)+ "]", fieldValue.getClass().getComponentType(), Array.get(fieldValue, index), fieldValue);
+					printFieldsValuesRecursively(memberName + "[" + Integer.toString(index)+ "]", fieldValue.getClass().getComponentType(), Array.get(fieldValue, index));
 				}
 			}
 			System.out.println();
@@ -240,7 +245,8 @@ public class Inspector
 				{
 					fieldMembers[i].setAccessible(true);
 					Object value = fieldMembers[i].get(fieldValue);
-					printFieldsValuesRecursively(fieldMembers[i].getName(), fieldMembers[i].getType(), value, fieldValue);
+					printedObjectsValues.add(fieldValue);
+					printFieldsValuesRecursively(fieldMembers[i].getName(), fieldMembers[i].getType(), value);
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
