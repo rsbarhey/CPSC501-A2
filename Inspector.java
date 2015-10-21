@@ -2,6 +2,7 @@ import java.lang.reflect.*;
 import java.lang.Object;
 import java.lang.Class;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class Inspector
 {
@@ -12,11 +13,13 @@ public class Inspector
 	private Method[] inspectedMethods;
 	private Field[] inspectedFields;
 	private Class[] inspectedInterfaces;
+	private HashSet printedObjectsValues;
 	
 	final Class<?>[] PRIMITIVE_WRAPPERS = {Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, String.class};
 
 	public void inspect(Object obj, boolean recursive)
 	{
+		printedObjectsValues = new HashSet();
 		getClass(obj);
 		getSuperClass(obj);
 		getInterfaces(obj);
@@ -36,12 +39,17 @@ public class Inspector
 		printListOfInspectedNames(inspectedFields, "Declared fields: \t\t");
 		
 		//Traversing the hierarchy
-		System.out.println("***********************************************************************************************");
-		traverseSuperClass(inspectedSuperClass, inspectedClass);
-		System.out.println("***********************************************************************************************");
 		System.out.println("_______________________________________________________________________________________________");
+		printInspectedName(inspectedSuperClass, "Inspecting imidiate super: \t\t");
+		traverseSuperClass(inspectedSuperClass, inspectedClass);
+		System.out.println("_______________________________________________________________________________________________");
+		System.out.println();
+		
+		System.out.println("_______________________________________________________________________________________________");
+		printListOfInspectedNames(inspectedInterfaces, "Inspecteing imidiate interfaces: \t\t");
 		traverseInterfaces(inspectedInterfaces, inspectedClass);
 		System.out.println("_______________________________________________________________________________________________");
+		System.out.println();
 		
 		//Printing values
 		printFieldsValues(inspectedFields, obj, recursive);
@@ -70,7 +78,7 @@ public class Inspector
 
 	private void traverseSuperClass(Class superClass, Class extendingClass)
 	{
-		if (superClass.equals(Object.class))
+		if (superClass == null)
 		{
 			return;
 		}
@@ -104,67 +112,95 @@ public class Inspector
 	
 	private void printFieldsValues(Field[] fields, Object obj, boolean recursive)
 	{
-		System.out.println("Printing the class values \t recursion is set to: " + Boolean.toString(recursive));
-		for(int i = 0; i<fields.length; i++)
+		System.out.println("Printing the values for object of "+ obj.getClass().getName() +" \t recursion is set to: " + Boolean.toString(recursive));
+		
+		if(obj.getClass().isArray())
 		{
-			fields[i].setAccessible(true);
-			try 
+			int length = Array.getLength(obj);
+			System.out.println();
+			System.out.println(obj.getClass().getName() + " "+ obj.getClass().getName());
+			for(int index = 0; index<length; index++)
 			{
-				Object value = fields[i].get(obj);
-				
-				if(value == null)
+				if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(obj.getClass().getComponentType()) || obj.getClass().getComponentType().isPrimitive() || Array.get(obj, index) == null)
 				{
-					printInspectedName(value, fields[i].getName() + " = ");
-				}
-				
-				else if(value.getClass().isArray())
-				{
-					int length = Array.getLength(value);
-					System.out.println();
-					System.out.println(value.getClass().getComponentType().getName() + "[] "+ fields[i].getName());
-					for(int index = 0; index<length; index++)
-					{
-						if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass().getComponentType()) || value.getClass().getComponentType().isPrimitive() || Array.get(value, index) == null)
-						{
-							printInspectedName(Array.get(value, index), fields[i].getName() + "[" + Integer.toString(index)+ "] = ");
-						}
-						
-						else if(recursive)
-						{
-							printFieldsValuesRecursively(fields[i].getName() + "[" + Integer.toString(index)+ "]", value.getClass().getComponentType(), Array.get(value, index), obj);
-						}
-						
-						else
-						{
-							printInspectedName(Array.get(value, index).hashCode(), fields[i].getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");	
-						}
-					}
-					System.out.println();
-				}
-				
-				else if (Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass()) || value.getClass().isPrimitive())
-				{
-					printInspectedName(value, fields[i].getName() + " = ");
+					printInspectedName(Array.get(obj, index), obj.getClass().getName() + "[" + Integer.toString(index)+ "] = ");
 				}
 				
 				else if(recursive)
 				{
-					System.out.println();
-					printFieldsValuesRecursively(fields[i].getName(), fields[i].getType(), value, obj);
-					System.out.println();
+					printFieldsValuesRecursively(obj.getClass().getName() + "[" + Integer.toString(index)+ "]", obj.getClass().getComponentType(), Array.get(obj, index), obj);
 				}
 				
 				else
 				{
-					printInspectedName(value.hashCode(), fields[i].getName() + " address(HashCode) is ");
+					printInspectedName(Array.get(obj, index).hashCode(), obj.getClass().getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");	
 				}
-			} 
-			catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} 
-			catch (IllegalAccessException e) 
+			}
+			System.out.println();
+		}
+		
+		else{
+			for(int i = 0; i<fields.length; i++)
 			{
-				e.printStackTrace();
+				fields[i].setAccessible(true);
+				try 
+				{
+					Object value = fields[i].get(obj);
+				
+					if(value == null)
+					{
+						printInspectedName(value, fields[i].getName() + " = ");
+					}
+				
+					else if(value.getClass().isArray())
+					{
+						int length = Array.getLength(value);
+						System.out.println();
+						System.out.println(value.getClass().getName() + " "+ fields[i].getName());
+						for(int index = 0; index<length; index++)
+						{
+							if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass().getComponentType()) || value.getClass().getComponentType().isPrimitive() || Array.get(value, index) == null)
+							{
+								printInspectedName(Array.get(value, index), fields[i].getName() + "[" + Integer.toString(index)+ "] = ");
+							}
+						
+							else if(recursive)
+							{
+								printFieldsValuesRecursively(fields[i].getName() + "[" + Integer.toString(index)+ "]", value.getClass().getComponentType(), Array.get(value, index), obj);
+							}
+						
+							else
+							{
+								printInspectedName(Array.get(value, index).hashCode(), fields[i].getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");	
+							}
+						}
+						System.out.println();
+					}
+				
+					else if (Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass()) || value.getClass().isPrimitive())
+					{
+						printInspectedName(value, fields[i].getName() + " = ");
+					}
+				
+					else if(recursive)
+					{
+						System.out.println();
+						printFieldsValuesRecursively(fields[i].getName(), fields[i].getType(), value, obj);
+						System.out.println();
+					}
+				
+					else
+					{
+						printInspectedName(value.hashCode(), fields[i].getName() + " address(HashCode) is ");
+					}
+				} 
+				catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} 
+				catch (IllegalAccessException e) 
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -189,7 +225,7 @@ public class Inspector
 				
 				else
 				{
-					printFieldsValuesRecursively(memberName + "[" + Integer.toString(index)+ "]", fieldValue.getClass().getComponentType(), Array.get(fieldValue, index), originalObj);
+					printFieldsValuesRecursively(memberName + "[" + Integer.toString(index)+ "]", fieldValue.getClass().getComponentType(), Array.get(fieldValue, index), fieldValue);
 				}
 			}
 			System.out.println();
@@ -200,12 +236,11 @@ public class Inspector
 			Field[] fieldMembers = type.getDeclaredFields();
 			for(int i = 0; i < fieldMembers.length; i++)
 			{
-				
 				try 
 				{
 					fieldMembers[i].setAccessible(true);
-					Object value = fieldMembers[i].get(originalObj);
-					printFieldsValuesRecursively(fieldMembers[i].getName(), fieldMembers[i].getType(), value, originalObj);
+					Object value = fieldMembers[i].get(fieldValue);
+					printFieldsValuesRecursively(fieldMembers[i].getName(), fieldMembers[i].getType(), value, fieldValue);
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
