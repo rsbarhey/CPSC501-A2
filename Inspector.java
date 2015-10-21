@@ -111,7 +111,12 @@ public class Inspector
 			{
 				Object value = fields[i].get(obj);
 				
-				if(value.getClass().isArray())
+				if(value == null)
+				{
+					printInspectedName(value, fields[i].getName() + " = ");
+				}
+				
+				else if(value.equals(null) && value.getClass().isArray())
 				{
 					int length = Array.getLength(value);
 					for(int index = 0; index<length; index++)
@@ -120,12 +125,32 @@ public class Inspector
 						{
 							printInspectedName(Array.get(value, index), fields[i].getName() + "[" + Integer.toString(index)+ "] = ");
 						}
+						
+						else if(recursive)
+						{
+							
+						}
+						
+						else
+						{
+							printInspectedName(Array.get(value, index).hashCode(), fields[i].getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");
+						}
 					}
 				}
 				
 				else if (Arrays.asList(PRIMITIVE_WRAPPERS).contains(value.getClass()) || value.getClass().isPrimitive())
 				{
 					printInspectedName(value.toString(), fields[i].getName() + " = ");
+				}
+				
+				else if(recursive)
+				{
+					
+				}
+				
+				else
+				{
+					printInspectedName(value.hashCode(), fields[i].getName() + " address(HashCode) is ");
 				}
 			} 
 			catch (IllegalArgumentException e) {
@@ -136,6 +161,11 @@ public class Inspector
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private void printFieldsValuesRecursively(Field field, Object obj)
+	{
+		
 	}
 
 	private void getConstructors(Object obj) 
