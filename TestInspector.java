@@ -8,6 +8,7 @@ class Base extends Super implements DoSomething
 	private double doubleField;
 	private String stringField;
 	private int[] intArray;
+	private Super superField = new Super();
 	
 	public Base()
 	{
@@ -109,7 +110,7 @@ public class TestInspector {
 	{
 		Object obj = new Base();
 		inspector.inspect(obj, false);
-		assertEquals(4, inspector.GetInspectedFields().length);
+		assertEquals(5, inspector.GetInspectedFields().length);
 		assertEquals("integerField", inspector.GetInspectedFields()[0].getName());
 		assertEquals("doubleField", inspector.GetInspectedFields()[1].getName());
 		assertEquals("stringField", inspector.GetInspectedFields()[2].getName());

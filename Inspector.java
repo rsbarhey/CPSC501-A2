@@ -39,6 +39,9 @@ public class Inspector
 		System.out.println("_______________________________________________________________________________________________");
 		traverseInterfaces(inspectedInterfaces, inspectedClass);
 		System.out.println("_______________________________________________________________________________________________");
+		
+		//Printing values
+		printFieldsValues(obj, recursive);
 		System.out.println("===============================================================================================");
 	}
 
@@ -93,6 +96,37 @@ public class Inspector
 			printListOfInspectedNames(interfaces[i].getDeclaredFields(), "Constant fields: \t\t");
 			System.out.println("-----------------------------------------------------------------------------------------------");
 			traverseInterfaces(interfaces[i].getInterfaces(), interfaces[i]);
+		}
+	}
+	
+	private void printFieldsValues(Object obj, boolean recursive)
+	{
+		for(int i = 0; i<inspectedFields.length; i++)
+		{
+			inspectedFields[i].setAccessible(true);
+			try 
+			{
+				Object value = inspectedFields[i].get(obj);
+				if(value.getClass().isArray())
+				{
+					int length = Array.getLength(value);
+					for(int index = 0; index<length; index++)
+					{
+						printInspectedName(Array.get(value, index), inspectedFields[i].getName() + "[" + Integer.toString(index)+ "]= ");
+					}
+				}
+				else
+				{
+					printInspectedName(value.toString(), inspectedFields[i].getName() + " value is: \t\t");
+				}
+			} 
+			catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} 
+			catch (IllegalAccessException e) 
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 
