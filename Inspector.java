@@ -116,7 +116,7 @@ public class Inspector
 					printInspectedName(value, fields[i].getName() + " = ");
 				}
 				
-				else if(value.equals(null) && value.getClass().isArray())
+				else if(value.getClass().isArray())
 				{
 					int length = Array.getLength(value);
 					for(int index = 0; index<length; index++)
@@ -133,7 +133,14 @@ public class Inspector
 						
 						else
 						{
-							printInspectedName(Array.get(value, index).hashCode(), fields[i].getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");
+							if(Array.get(value, index) == null)
+							{
+								printInspectedName(Array.get(value, index), fields[i].getName() + "[" + Integer.toString(index)+ "] = ");
+							}
+							else
+							{
+								printInspectedName(Array.get(value, index).hashCode(), fields[i].getName() + "[" + Integer.toString(index)+ "] address (HashCode) ");
+							}
 						}
 					}
 				}
