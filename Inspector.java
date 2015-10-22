@@ -122,7 +122,10 @@ public class Inspector
 		else{
 			for(int i = 0; i<fields.length; i++)
 			{
-				fields[i].setAccessible(true);
+				if(!fields[i].isAccessible())
+				{
+					fields[i].setAccessible(true);
+				}
 				try 
 				{
 					Object value = fields[i].get(obj);
@@ -210,7 +213,10 @@ public class Inspector
 			{
 				try 
 				{
-					fieldMembers[i].setAccessible(true);
+					if(fieldMembers[i].isAccessible())
+					{
+						fieldMembers[i].setAccessible(true);
+					}
 					Object value = fieldMembers[i].get(fieldValue);
 					printedObjectsValues.add(fieldValue);
 					printFieldsValuesRecursively(fieldMembers[i].getName(), fieldMembers[i].getType(), value);
