@@ -3,6 +3,7 @@ import java.lang.Object;
 import java.lang.Class;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Comparator;
 
 public class Inspector
 {
@@ -182,6 +183,18 @@ public class Inspector
 			System.out.println("Object has already been printed");
 			return;
 		}
+		
+		//before going deeper we need to check if the member has a super class that has fields needed to be printed
+		// we also check if it's not of type Comparator
+		if(type != null && type != Comparator.class && !(Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass()) || fieldValue.getClass().isPrimitive()))
+		{
+			if(!type.getSuperclass().equals(Object.class))
+			{
+				type = type.getSuperclass();
+				printFieldsValues(type.getDeclaredFields(), fieldValue, type, true);
+			}
+		}
+		
 		if(fieldValue == null || Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass()) || fieldValue.getClass().isPrimitive())
 		{
 			printInspectedName(fieldValue, memberName + " = ");
@@ -205,6 +218,7 @@ public class Inspector
 			}
 			System.out.println();
 		}
+		
 		else
 		{
 			System.out.println(memberName+ " object has members: ");
@@ -213,7 +227,7 @@ public class Inspector
 			{
 				try 
 				{
-					if(fieldMembers[i].isAccessible())
+					if(!fieldMembers[i].isAccessible())
 					{
 						fieldMembers[i].setAccessible(true);
 					}
