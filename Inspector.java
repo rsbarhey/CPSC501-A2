@@ -53,7 +53,7 @@ public class Inspector
 		System.out.println();
 		
 		//Printing values
-		printFieldsValues(inspectedFields, obj, obj.getClass(), recursive);
+		printFieldsValues(inspectedFields, obj, obj.getClass(), recursive, "object");
 		System.out.println("===============================================================================================");
 	}
 
@@ -111,9 +111,9 @@ public class Inspector
 		}
 	}
 	
-	private void printFieldsValues(Field[] fields, Object obj, Class currentClass,boolean recursive)
+	private void printFieldsValues(Field[] fields, Object obj, Class currentClass, boolean recursive, String objName)
 	{
-		System.out.println("Printing the values for object declared in "+ currentClass.getName() +" \t recursion is set to: " + Boolean.toString(recursive));
+		System.out.println("Printing the fields values for "+ objName +" that are declared in "+ currentClass.getName() +" \t recursion is set to: " + Boolean.toString(recursive));
 		
 		if(obj.getClass().isArray())
 		{
@@ -170,9 +170,9 @@ public class Inspector
 		
 		if(!currentClass.getSuperclass().equals(Object.class))
 		{
-			System.out.println("Inspecting super fields");
+			System.out.println("Inspecting super fields for " + objName);
 			currentClass = currentClass.getSuperclass();
-			printFieldsValues(currentClass.getDeclaredFields(), obj, currentClass,recursive);
+			printFieldsValues(currentClass.getDeclaredFields(), obj, currentClass,recursive, objName);
 		}
 	}
 	
@@ -182,19 +182,6 @@ public class Inspector
 		{
 			System.out.println("Object has already been printed");
 			return;
-		}
-		
-		//before going deeper we need to check if the member has a super class that has fields needed to be printed
-		//we also check if it's not of type Comparator
-		if(type != null && type != Comparator.class && !(Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass()) || fieldValue.getClass().isPrimitive()))
-		{
-			if(!type.getSuperclass().equals(Object.class))
-			{
-				type = type.getSuperclass();
-				System.out.println(memberName + " has super class: " + type.getName() + " Inspecting deeper ..." );
-				printFieldsValues(type.getDeclaredFields(), fieldValue, type, true);
-				System.out.println();
-			}
 		}
 		
 		if(fieldValue == null || Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass()) || fieldValue.getClass().isPrimitive())
@@ -221,7 +208,7 @@ public class Inspector
 			System.out.println();
 		}
 		
-		else
+		else if(type.getDeclaredFields().length > 0)
 		{
 			System.out.println(memberName+ " object has members: ");
 			Field[] fieldMembers = type.getDeclaredFields();
@@ -241,6 +228,19 @@ public class Inspector
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 				} 
+			}
+		}
+		
+		//before going deeper we need to check if the member has a super class that has fields needed to be printed
+		//we also check if it's not of type Comparator
+		if(type != null && type != Comparator.class && !(Arrays.asList(PRIMITIVE_WRAPPERS).contains(fieldValue.getClass()) || fieldValue.getClass().isPrimitive()))
+		{
+			if(!type.getSuperclass().equals(Object.class))
+			{
+				type = type.getSuperclass();
+				System.out.println(memberName + " has super class: " + type.getName() + " Inspecting deeper ..." );
+				printFieldsValues(type.getDeclaredFields(), fieldValue, type, true, memberName);
+				System.out.println();
 			}
 		}
 	}
