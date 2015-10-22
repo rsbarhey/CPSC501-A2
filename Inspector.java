@@ -249,12 +249,12 @@ public class Inspector
 	{
 		int length = Array.getLength(obj);
 		System.out.println();
-		System.out.println(obj.getClass().getName() + " "+ obj.getClass().getName());
+		System.out.println(obj.getClass().getComponentType().getName() + "[]");
 		for(int index = 0; index<length; index++)
 		{
 			if(Arrays.asList(PRIMITIVE_WRAPPERS).contains(obj.getClass().getComponentType()) || obj.getClass().getComponentType().isPrimitive() || Array.get(obj, index) == null)
 			{
-				printObjectWithHeader(Array.get(obj, index), obj.getClass().getName() + "[" + Integer.toString(index)+ "] = ");
+				printObjectWithHeader(Array.get(obj, index), obj.getClass().getComponentType().getName() + "[" + Integer.toString(index)+ "] = ");
 			}
 			
 			else if(recursive)
