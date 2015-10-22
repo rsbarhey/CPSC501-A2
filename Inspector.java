@@ -52,7 +52,7 @@ public class Inspector
 		System.out.println();
 		
 		//Printing values
-		printFieldsValues(inspectedFields, obj, recursive);
+		printFieldsValues(inspectedFields, obj, obj.getClass(), recursive);
 		System.out.println("===============================================================================================");
 	}
 
@@ -110,9 +110,9 @@ public class Inspector
 		}
 	}
 	
-	private void printFieldsValues(Field[] fields, Object obj, boolean recursive)
+	private void printFieldsValues(Field[] fields, Object obj, Class currentClass,boolean recursive)
 	{
-		System.out.println("Printing the values for object of "+ obj.getClass().getName() +" \t recursion is set to: " + Boolean.toString(recursive));
+		System.out.println("Printing the values for object declared in "+ currentClass.getName() +" \t recursion is set to: " + Boolean.toString(recursive));
 		
 		if(obj.getClass().isArray())
 		{
@@ -162,6 +162,13 @@ public class Inspector
 					e.printStackTrace();
 				}
 			}
+		}
+		
+		if(!currentClass.getSuperclass().equals(Object.class))
+		{
+			System.out.println("Inspecting super fields");
+			currentClass = currentClass.getSuperclass();
+			printFieldsValues(currentClass.getDeclaredFields(), obj, currentClass,recursive);
 		}
 	}
 	
